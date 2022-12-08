@@ -1,0 +1,7 @@
+tunnel: tunnel-homeassistant
+credentials-file: /data/data/com.termux/files/home/.cloudflared/ef65daa0-8537-4c4a-832d-52a4338b99a8.json
+
+ingress:
+  - hostname: homeassistant.sahanasri.systems
+    service: http://localhost:8123
+  - service: http_status:404

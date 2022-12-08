@@ -1,0 +1,130 @@
+mqtt:
+  host: localhost
+  user: homeassistant
+  password: ai29vcck
+
+cameras:
+  Main_Road:
+    ffmpeg:
+      hwaccel_args:
+        - -hwaccel
+        - vaapi
+        - -hwaccel_device
+        - /dev/dri/renderD128
+        - -hwaccel_output_format
+        - yuv420p
+      inputs:
+        - path: rtsp://homeassistant:ai29vcck@192.168.0.150:554/Streaming/Channels/101
+          roles:
+          - record
+        - path: rtsp://homeassistant:ai29vcck@192.168.0.150:554/Streaming/Channels/102
+          roles:
+          - detect
+          - rtmp
+    detect:
+      width: 640 # <---- update for your camera's resolution
+      height: 360 # <---- update for your camera's resolution
+      fps: 6
+      enabled: False
+    record:
+      enabled: True
+      retain:
+        days: 7
+        mode: all 
+  Front_Door:
+    ffmpeg:
+      hwaccel_args:
+        - -hwaccel
+        - vaapi
+        - -hwaccel_device
+        - /dev/dri/renderD128
+        - -hwaccel_output_format
+        - yuv420p
+      inputs:
+        - path: rtsp://homeassistant:ai29vcck@192.168.0.151/cam/realmonitor?channel=1&subtype=0
+          roles:
+          - record
+        - path: rtsp://homeassistant:ai29vcck@192.168.0.151/cam/realmonitor?channel=1&subtype=1
+          roles:
+          - detect
+          - rtmp
+    detect:
+      width: 480 # <---- update for your camera's resolution
+      height: 704 # <---- update for your camera's resolution
+      fps: 5
+      enabled: false
+    record:
+      enabled: True
+      retain:
+        days: 7
+        mode: all
+  Office_Entrance:
+    ffmpeg:
+      hwaccel_args:
+        - -hwaccel
+        - vaapi
+        - -hwaccel_device
+        - /dev/dri/renderD128
+        - -hwaccel_output_format
+        - yuv420p
+      inputs:
+        - path: rtsp://homeassistant:ai29vcck@192.168.0.152/cam/realmonitor?channel=1&subtype=0
+          roles:
+          - record
+        - path: rtsp://homeassistant:ai29vcck@192.168.0.152/cam/realmonitor?channel=1&subtype=1
+          roles:
+          - detect
+          - rtmp
+    detect:
+      width: 480 # <---- update for your camera's resolution
+      height: 704 # <---- update for your camera's resolution
+      fps: 5
+      enabled: False
+    record:
+      enabled: True
+      retain:
+        days: 7
+        mode: all
+
+  Terrace:
+    ffmpeg:
+      hwaccel_args:
+        - -hwaccel
+        - vaapi
+        - -hwaccel_device
+        - /dev/dri/renderD128
+        - -hwaccel_output_format
+        - yuv420p
+      inputs:
+        - path: rtsp://homeassistant:ai29vcck@192.168.0.153:554/Streaming/Channels/101
+          roles:
+          - record
+        - path: rtsp://homeassistant:ai29vcck@192.168.0.153:554/Streaming/Channels/102
+          roles:
+          - detect
+          - rtmp
+    detect:
+      width: 640 # <---- update for your camera's resolution
+      height: 360 # <---- update for your camera's resolution
+      fps: 6
+      enabled: False
+    record:
+      enabled: True
+      retain:
+        days: 7
+        mode: all
+birdseye:
+  # Optional: Enable birdseye view (default: shown below)
+  enabled: True
+  # Optional: Width of the output resolution (default: shown below)
+  width: 1280
+  # Optional: Height of the output resolution (default: shown below)
+  height: 720
+  # Optional: Encoding quality of the mpeg1 feed (default: shown below)
+  # 1 is the highest quality, and 31 is the lowest. Lower quality feeds utilize less CPU resources.
+  quality: 8
+  # Optional: Mode of the view. Available options are: objects, motion, and continuous
+  #   objects - cameras are included if they have had a tracked object within the last 30 seconds
+  #   motion - cameras are included if motion was detected in the last 30 seconds
+  #   continuous - all cameras are included always
+  mode: continuous

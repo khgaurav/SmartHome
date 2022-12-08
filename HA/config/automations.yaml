@@ -1,0 +1,432 @@
+- id: '1639301029563'
+  alias: Gaurav Bedroom devices motion
+  description: 'Turn on bedroom light when motion detected near stairs and sun is
+    set and turn off bathroom '
+  trigger:
+  - type: motion
+    platform: device
+    device_id: 5495ae59400c4fe7c65b446228b5fe27
+    entity_id: binary_sensor.motion_sensor
+    domain: binary_sensor
+  condition:
+  - condition: state
+    entity_id: person.gaurav_k_h
+    state: home
+  action:
+  - type: turn_off
+    device_id: 683165b3b1105d04abb62e5246231b4d
+    entity_id: light.bathroom_on_off
+    domain: light
+  - condition: device
+    type: is_off
+    device_id: 96605113eee425a9dff222a12c62d582
+    entity_id: light.tubelight_on_off
+    domain: light
+    for:
+      hours: 0
+      minutes: 1
+      seconds: 0
+      milliseconds: 0
+  - condition: device
+    type: is_off
+    device_id: e363e4f728c874a2b823da292a5e3369
+    entity_id: switch.fan_on_off
+    domain: switch
+    for:
+      hours: 0
+      minutes: 1
+      seconds: 0
+      milliseconds: 0
+  - condition: device
+    type: is_off
+    device_id: 1a2635564d12e3913a1b5911878e2587
+    entity_id: light.night_on_off
+    domain: light
+    for:
+      hours: 0
+      minutes: 1
+      seconds: 0
+      milliseconds: 0
+  - condition: device
+    type: is_off
+    device_id: 2846164d0aa5ce931f638ac964446998
+    entity_id: switch.workstation_on_off
+    domain: switch
+    for:
+      hours: 0
+      minutes: 1
+      seconds: 0
+      milliseconds: 0
+  - condition: zone
+    entity_id: person.gaurav_k_h
+    zone: zone.home
+  - choose:
+    - conditions:
+      - condition: numeric_state
+        entity_id: weather.sahanasri
+        attribute: temperature
+        above: '23'
+      sequence:
+      - type: turn_on
+        device_id: e363e4f728c874a2b823da292a5e3369
+        entity_id: switch.fan_on_off
+        domain: switch
+    default: []
+  - choose:
+    - conditions:
+      - condition: or
+        conditions:
+        - condition: sun
+          after: sunset
+          after_offset: -01:00:00
+        - condition: time
+          before: 00:01
+      sequence:
+      - type: turn_on
+        device_id: 96605113eee425a9dff222a12c62d582
+        entity_id: light.tubelight_on_off
+        domain: light
+    default: []
+  mode: single
+- id: '1639303981704'
+  alias: Leaving home
+  description: Turn off all bedroom devices if not at home
+  trigger:
+  - platform: state
+    entity_id: person.gaurav_k_h
+    for:
+      hours: 0
+      minutes: 15
+      seconds: 0
+      milliseconds: 0
+    to: not_home
+  condition:
+  - type: is_no_motion
+    condition: device
+    device_id: 5495ae59400c4fe7c65b446228b5fe27
+    entity_id: binary_sensor.motion_sensor
+    domain: binary_sensor
+  action:
+  - scene: scene.all_services_off
+  mode: single
+- id: '1639395426338'
+  alias: Notification on power loss
+  description: Get notification to all phones when power lost
+  trigger:
+  - device_id: 96605113eee425a9dff222a12c62d582
+    domain: zha
+    platform: device
+    type: device_offline
+    subtype: device_offline
+  - device_id: 683165b3b1105d04abb62e5246231b4d
+    domain: zha
+    platform: device
+    type: device_offline
+    subtype: device_offline
+  - device_id: 1a2635564d12e3913a1b5911878e2587
+    domain: zha
+    platform: device
+    type: device_offline
+    subtype: device_offline
+  - device_id: 2846164d0aa5ce931f638ac964446998
+    domain: zha
+    platform: device
+    type: device_offline
+    subtype: device_offline
+  - device_id: e363e4f728c874a2b823da292a5e3369
+    domain: zha
+    platform: device
+    type: device_offline
+    subtype: device_offline
+  condition: []
+  action:
+  - device_id: e73077bc4d164036ea11f09a8cc1c504
+    domain: mobile_app
+    type: notify
+    message: ZigBee Devices lost
+    title: Home warning
+  mode: single
+- id: '1641061643370'
+  alias: Download torrent
+  description: ''
+  trigger:
+  - platform: state
+    entity_id: input_text.addtorrent
+  condition: []
+  action:
+  - service: transmission.add_torrent
+    data:
+      name: Transmission
+      torrent: '{{ states.input_text.addtorrent.state }}'
+  mode: single
+- id: '1643031991784'
+  alias: Gaurav bedroom devices on
+  description: turn off night light when you light turned on
+  trigger:
+  - platform: device
+    type: turned_on
+    device_id: 96605113eee425a9dff222a12c62d582
+    entity_id: light.tubelight_on_off
+    domain: light
+    id: tubelight_on
+  - platform: device
+    type: turned_on
+    device_id: 1a2635564d12e3913a1b5911878e2587
+    entity_id: light.night_on_off
+    domain: light
+    id: night_on
+  - platform: state
+    entity_id: switch.gaurav_laptop
+    from: 'off'
+    to: 'on'
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 0
+      milliseconds: 0
+    id: laptop_on
+  - platform: tag
+    tag_id: 0919d810-90f0-4ba8-b3be-f495f15619b6
+    id: workstation_tag
+  condition:
+  - condition: state
+    entity_id: person.gaurav_k_h
+    state: home
+  action:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: tubelight_on
+      - condition: device
+        type: is_on
+        device_id: 1a2635564d12e3913a1b5911878e2587
+        entity_id: light.night_on_off
+        domain: light
+      sequence:
+      - type: turn_off
+        device_id: 1a2635564d12e3913a1b5911878e2587
+        entity_id: light.night_on_off
+        domain: light
+    - conditions:
+      - condition: trigger
+        id: night_on
+      - condition: device
+        type: is_on
+        device_id: 96605113eee425a9dff222a12c62d582
+        entity_id: light.tubelight_on_off
+        domain: light
+      sequence:
+      - type: turn_off
+        device_id: 96605113eee425a9dff222a12c62d582
+        entity_id: light.tubelight_on_off
+        domain: light
+    - conditions:
+      - condition: trigger
+        id: laptop_on
+      sequence:
+      - type: turn_on
+        device_id: 2846164d0aa5ce931f638ac964446998
+        entity_id: switch.workstation_on_off
+        domain: switch
+    - conditions:
+      - condition: trigger
+        id: workstation_tag
+      sequence:
+      - service: automation.trigger
+        target:
+          entity_id: automation.bedroom_lights
+        data:
+          skip_condition: false
+      - type: turn_on
+        device_id: 2846164d0aa5ce931f638ac964446998
+        entity_id: switch.workstation_on_off
+        domain: switch
+      - condition: time
+        weekday:
+        - sat
+        - sun
+      - service: switch.turn_on
+        target:
+          entity_id: switch.gaurav_laptop
+    default: []
+  mode: single
+- id: '1644685813650'
+  alias: Gaurav Bedroom Button click
+  description: ''
+  trigger:
+  - device_id: 0ec4108684bc4c24e9bbf88ce4576b72
+    domain: zha
+    platform: device
+    type: remote_button_short_press
+    subtype: button
+    id: button_single
+  - device_id: 0ec4108684bc4c24e9bbf88ce4576b72
+    domain: zha
+    platform: device
+    type: remote_button_double_press
+    subtype: button
+    id: button_double
+  - device_id: 0ec4108684bc4c24e9bbf88ce4576b72
+    domain: zha
+    platform: device
+    type: remote_button_long_press
+    subtype: button
+  condition: []
+  action:
+  - choose:
+    - conditions:
+      - condition: device
+        type: is_off
+        device_id: 96605113eee425a9dff222a12c62d582
+        entity_id: light.tubelight_on_off
+        domain: light
+      - condition: trigger
+        id: button_single
+      sequence:
+      - type: toggle
+        device_id: 96605113eee425a9dff222a12c62d582
+        entity_id: light.tubelight_on_off
+        domain: light
+    - conditions:
+      - condition: device
+        type: is_off
+        device_id: 1a2635564d12e3913a1b5911878e2587
+        entity_id: light.night_on_off
+        domain: light
+      - condition: trigger
+        id: button_single
+      sequence:
+      - type: toggle
+        device_id: 1a2635564d12e3913a1b5911878e2587
+        entity_id: light.night_on_off
+        domain: light
+    - conditions:
+      - condition: trigger
+        id: button_double
+      sequence:
+      - type: toggle
+        device_id: e363e4f728c874a2b823da292a5e3369
+        entity_id: switch.fan_on_off
+        domain: switch
+    default:
+    - scene: scene.all_services_off
+    - type: turn_on
+      device_id: e363e4f728c874a2b823da292a5e3369
+      entity_id: switch.fan_on_off
+      domain: switch
+  mode: restart
+  max: 10
+- id: '1645804604549'
+  alias: Gaurav Bathroom light turned on
+  description: turn off all lights in bedroom when bathroom light turned on
+  trigger:
+  - platform: device
+    type: turned_on
+    device_id: 683165b3b1105d04abb62e5246231b4d
+    entity_id: light.bathroom_on_off
+    domain: light
+    for:
+      hours: 0
+      minutes: 3
+      seconds: 0
+      milliseconds: 0
+  condition:
+  - type: is_no_motion
+    condition: device
+    device_id: 5495ae59400c4fe7c65b446228b5fe27
+    entity_id: binary_sensor.motion_sensor
+    domain: binary_sensor
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 0
+      milliseconds: 0
+  action:
+  - scene: scene.gqurav_bedroom_off
+  mode: single
+- id: '1664113530133'
+  alias: 'Night lights Ground floor '
+  description: ''
+  trigger:
+  - platform: time
+    at: '22:00:00'
+    id: off_door_light
+  - platform: time
+    at: '22:15:00'
+    id: on_living_light
+  - platform: time
+    at: 06:30:00
+    id: off_living_light
+  - platform: device
+    type: turned_on
+    device_id: e7c44f5df94f38edb1847fc9a7329912
+    entity_id: light.hall_night_light
+    domain: light
+    id: hall_night
+  - platform: sun
+    event: sunset
+    offset: -00:10:00
+    id: on_door_light
+  condition: []
+  action:
+  - if:
+    - condition: trigger
+      id: on_door_light
+    then:
+    - type: turn_on
+      device_id: 73d625b2377625aff052e266ab9cbf2b
+      entity_id: light.front_door_light
+      domain: light
+    else:
+    - if:
+      - condition: trigger
+        id: off_door_light
+      then:
+      - type: turn_off
+        device_id: 73d625b2377625aff052e266ab9cbf2b
+        entity_id: light.front_door_light
+        domain: light
+      else:
+      - if:
+        - condition: trigger
+          id: on_living_light
+        then:
+        - type: turn_on
+          device_id: e7c44f5df94f38edb1847fc9a7329912
+          entity_id: light.hall_night_light
+          domain: light
+        else:
+        - if:
+          - condition: or
+            conditions:
+            - condition: trigger
+              id: off_living_light
+            - condition: and
+              conditions:
+              - condition: not
+                conditions:
+                - condition: time
+                  after: '22:15:00'
+                  before: 06:30:00
+              - condition: trigger
+                id: hall_night
+          then:
+          - type: turn_off
+            device_id: e7c44f5df94f38edb1847fc9a7329912
+            entity_id: light.hall_night_light
+            domain: light
+          else: []
+  mode: single
+- id: '1664949035598'
+  alias: Tag Gaurav Room off is scanned
+  description: ''
+  trigger:
+  - platform: tag
+    tag_id: a0162ed6-f404-470f-880e-c244b8991d3f
+  condition: []
+  action:
+  - service: scene.turn_on
+    target:
+      entity_id: scene.gqurav_bedroom_off
+    metadata: {}
+  mode: single

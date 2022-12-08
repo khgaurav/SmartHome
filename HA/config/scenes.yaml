@@ -1,0 +1,69 @@
+- id: '1644686013375'
+  name: All devices off
+  entities:
+    light.bathroom_on_off:
+      supported_color_modes:
+      - onoff
+      off_brightness:
+      friendly_name: Bathroom
+      icon: mdi:bathtub-outline
+      supported_features: 8
+      state: 'off'
+    light.tubelight_on_off:
+      supported_color_modes:
+      - onoff
+      off_brightness:
+      friendly_name: Tubelight
+      icon: mdi:bed
+      supported_features: 8
+      state: 'off'
+    light.night_on_off:
+      supported_color_modes:
+      - onoff
+      off_brightness:
+      friendly_name: Night
+      icon: mdi:weather-night
+      supported_features: 8
+      state: 'off'
+    switch.fan_on_off:
+      friendly_name: Fan
+      icon: mdi:ceiling-fan
+      state: 'off'
+    switch.workstation_on_off:
+      friendly_name: Workstation
+      icon: mdi:power-plug
+      state: 'off'
+    switch.gaurav_laptop:
+      friendly_name: Gaurav's Laptop
+      icon: mdi:laptop
+      assumed_state: true
+      state: 'off'
+    media_player.nesthubc9fc:
+      friendly_name: Gaurav's Bedroom display
+      supported_features: 152461
+      state: 'off'
+  icon: mdi:lightbulb-off
+- id: '1646551898375'
+  name: Gaurav Bedroom off
+  entities:
+    switch.fan_on_off:
+      friendly_name: Fan
+      icon: mdi:ceiling-fan
+      state: 'off'
+    light.night_on_off:
+      supported_color_modes:
+      - onoff
+      off_brightness:
+      friendly_name: Night
+      icon: mdi:weather-night
+      supported_features: 8
+      state: 'off'
+    light.tubelight_on_off:
+      supported_color_modes:
+      - onoff
+      off_brightness:
+      friendly_name: Tubelight
+      icon: mdi:bed
+      supported_features: 8
+      state: 'off'
+  icon: mdi:bed

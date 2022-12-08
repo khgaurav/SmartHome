@@ -1,0 +1,22 @@
+#Ignore cloudflared secrets
+.cloudflared/*
+!.cloudflared/config.yaml
+#Ignore frigate backups
+frigate/media/*
+# Ignore Home assistant secrets and component files
+HA/config/*
+!HA/config/*.yaml
+HA/config/secrets.yaml
+HA/config/groups.yaml
+
+#Ignore duplicati container as it is used for backups only and config is UI
+duplicati/
+
+#Ignore media-server config files(plex)
+media-server/*
+
+#Ignore mosquitto password file
+mosquitto/config/password.txt
+
+#Ignore portainer as it is just used for monitoring and config is UI
+portainer/*
