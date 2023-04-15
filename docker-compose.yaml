@@ -82,6 +82,33 @@ services:
       - 8200:8200
     restart: unless-stopped
 
+  airconnect:
+    image: 1activegeek/airconnect:latest
+    container_name: airconnect
+    network_mode: host
+    restart: unless-stopped
+
+  pihole:
+    container_name: pihole
+    image: pihole/pihole:latest
+    ports:
+      - "53:53/tcp"
+      - "53:53/udp"
+      - "67:67/udp"
+      - "8000:80/tcp"
+    environment:
+      - TZ=${CURRENTTZ} #this is the time zone
+    volumes:
+       - './etc-pihole/:/etc/pihole/'
+       - './etc-dnsmasq.d/:/etc/dnsmasq.d/'
+    dns:
+      - 127.0.0.1
+      - 1.1.1.1
+    cap_add:
+      - NET_ADMIN
+    restart: unless-stopped
+
+
   # plex:
   #   image: linuxserver/plex:latest
   #   container_name: plex

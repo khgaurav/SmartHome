@@ -47,23 +47,30 @@
   name: Gaurav Bedroom off
   entities:
     switch.fan_on_off:
-      friendly_name: Fan
       icon: mdi:ceiling-fan
+      friendly_name: Fan
       state: 'off'
     light.night_on_off:
       supported_color_modes:
       - onoff
+      off_with_transition: false
       off_brightness:
-      friendly_name: Night
       icon: mdi:weather-night
+      friendly_name: Night
       supported_features: 8
       state: 'off'
     light.tubelight_on_off:
       supported_color_modes:
       - onoff
+      off_with_transition: false
       off_brightness:
-      friendly_name: Tubelight
       icon: mdi:bed
+      friendly_name: Tubelight
       supported_features: 8
       state: 'off'
+    switch.workstation_on_off:
+      icon: mdi:desktop-tower-monitor
+      friendly_name: Workstation
+      state: 'off'
   icon: mdi:bed
+  metadata: {}

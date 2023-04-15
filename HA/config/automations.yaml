@@ -37,6 +37,7 @@
       minutes: 1
       seconds: 0
       milliseconds: 0
+    enabled: false
   - condition: device
     type: is_off
     device_id: 1a2635564d12e3913a1b5911878e2587
@@ -146,19 +147,6 @@
     message: ZigBee Devices lost
     title: Home warning
   mode: single
-- id: '1641061643370'
-  alias: Download torrent
-  description: ''
-  trigger:
-  - platform: state
-    entity_id: input_text.addtorrent
-  condition: []
-  action:
-  - service: transmission.add_torrent
-    data:
-      name: Transmission
-      torrent: '{{ states.input_text.addtorrent.state }}'
-  mode: single
 - id: '1643031991784'
   alias: Gaurav bedroom devices on
   description: turn off night light when you light turned on
@@ -183,7 +171,6 @@
       hours: 0
       minutes: 0
       seconds: 0
-      milliseconds: 0
     id: laptop_on
   - platform: tag
     tag_id: 0919d810-90f0-4ba8-b3be-f495f15619b6
@@ -228,6 +215,24 @@
         device_id: 2846164d0aa5ce931f638ac964446998
         entity_id: switch.workstation_on_off
         domain: switch
+      - delay:
+          hours: 0
+          minutes: 0
+          seconds: 10
+          milliseconds: 0
+      - service: switch.turn_on
+        data: {}
+        target:
+          entity_id: switch.gaurav_laptop
+      - delay:
+          hours: 0
+          minutes: 0
+          seconds: 10
+          milliseconds: 0
+      - service: switch.turn_off
+        data: {}
+        target:
+          entity_id: switch.gaurav_laptop
     - conditions:
       - condition: trigger
         id: workstation_tag
@@ -248,6 +253,7 @@
       - service: switch.turn_on
         target:
           entity_id: switch.gaurav_laptop
+        data: {}
     default: []
   mode: single
 - id: '1644685813650'
@@ -392,7 +398,7 @@
           id: on_living_light
         then:
         - type: turn_on
-          device_id: e7c44f5df94f38edb1847fc9a7329912
+          device_id: 57e0bddc1af4ac3f5fcd8a26a15cb3d6
           entity_id: light.hall_night_light
           domain: light
         else:
@@ -412,7 +418,7 @@
                 id: hall_night
           then:
           - type: turn_off
-            device_id: e7c44f5df94f38edb1847fc9a7329912
+            device_id: 57e0bddc1af4ac3f5fcd8a26a15cb3d6
             entity_id: light.hall_night_light
             domain: light
           else: []
