@@ -9,8 +9,8 @@ services:
       - NET_ADMIN
     environment:
       - VPN_SERVICE_PROVIDER=protonvpn
-      - OPENVPN_USER=gauravkh
-      - OPENVPN_PASSWORD=sahanasri
+      - OPENVPN_USER=${VPNUSER}
+      - OPENVPN_PASSWORD=${VPNPASS}
       - SERVER_COUNTRIES=Japan
       - FREE_ONLY=on
         # networks:
