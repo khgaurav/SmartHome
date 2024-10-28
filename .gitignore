@@ -1,0 +1,54 @@
+#Ignore cloudflared secrets
+.cloudflared/*
+!.cloudflared/config.yaml
+#Ignore frigate backups
+frigate/*
+!frigate/config/config.yml
+# Ignore Home assistant secrets and component files
+HA/config/*
+!HA/config/*.yaml
+HA/config/secrets.yaml
+HA/config/groups.yaml
+
+#Ignore duplicati container as it is used for backups only and config is UI
+duplicati/
+
+#Ignore media-server config files(plex)
+media-server/*
+
+#Ignore mosquitto password file
+mosquitto/config/password.txt
+
+#Ignore portainer as it is just used for monitoring and config is UI
+portainer/*
+
+#Ignore bazarr as it uses a UI config
+bazarr/*
+
+#Ignore radarr as it uses a UI config
+radarr/*
+
+#Ignore sonarr as it uses a UI config
+sonarr/*
+
+# Ignore lidarr as it uses a UI config
+lidarr/*
+
+# Ignore prowlarr as it uses a UI config
+prowlarr/*
+
+# Ignore PiHole config
+etc-pihole/*
+etc-dnsmasq.d/*
+
+#Ignore jellyfin as it uses a UI config
+jellyfin/*
+
+#Ignore mosquitto as it uses a UI config
+mosquitto/*
+
+# Ignore qbittorrent as it uses a UI config
+qbittorrent/*
+
+# Ignore tailscale as it uses a UI config
+tailscale/*

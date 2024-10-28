@@ -1,0 +1,130 @@
+gaurav_room_off:
+  sequence:
+  - if:
+    - condition: device
+      device_id: 7a5876c0c4d6f705a8b9559f4c592f4d
+      domain: media_player
+      entity_id: 438570577f76c13628db6d6ebad37dc6
+      type: is_playing
+    then:
+    - service: media_player.media_pause
+      metadata: {}
+      data: {}
+      target:
+        device_id: 7a5876c0c4d6f705a8b9559f4c592f4d
+  - service: fan.turn_off
+    data: {}
+    target:
+      area_id: gaurav_s_bedroom
+  - service: tts.google_translate_say
+    data:
+      cache: false
+      entity_id: media_player.nesthubc9fc
+      message: 'Turning off everything '
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 30
+      milliseconds: 0
+  - scene: scene.all_services_off
+  mode: single
+  alias: Gaurav Room off
+  icon: mdi:close-circle-outline
+new_script:
+  alias: Turn on Fan
+  sequence:
+  - choose:
+    - conditions:
+      - condition: numeric_state
+        entity_id: input_number.gaurav_fan_percentage
+        above: 0
+        below: 17
+      sequence:
+      - service: scene.turn_on
+        target:
+          entity_id: scene.fan_fan_speed1
+        data: {}
+    - conditions:
+      - condition: numeric_state
+        entity_id: input_number.gaurav_fan_percentage
+        above: 16
+        below: 34
+      sequence:
+      - service: scene.turn_on
+        target:
+          entity_id: scene.fan_fan_speed2
+        data: {}
+    - conditions:
+      - condition: numeric_state
+        entity_id: input_number.gaurav_fan_percentage
+        above: 33
+        below: 51
+      sequence:
+      - service: scene.turn_on
+        target:
+          entity_id: scene.fan_fan_speed3
+        data: {}
+    - conditions:
+      - condition: numeric_state
+        entity_id: input_number.gaurav_fan_percentage
+        above: 50
+        below: 68
+      sequence:
+      - service: scene.turn_on
+        target:
+          entity_id: scene.fan_fan_speed4
+        data: {}
+    - conditions:
+      - condition: numeric_state
+        entity_id: input_number.gaurav_fan_percentage
+        above: 67
+        below: 84
+      sequence:
+      - service: scene.turn_on
+        target:
+          entity_id: scene.fan_fan_speed5
+        data: {}
+    - conditions:
+      - condition: numeric_state
+        entity_id: input_number.gaurav_fan_percentage
+        above: 83
+      sequence:
+      - service: scene.turn_on
+        target:
+          entity_id:
+          - scene.fan_boost
+        data: {}
+  - if:
+    - condition: state
+      entity_id: input_boolean.gaurav_fan_state
+      state: 'off'
+    then:
+    - delay:
+        hours: 0
+        minutes: 0
+        seconds: 1
+        milliseconds: 0
+    - service: scene.turn_on
+      target:
+        entity_id: scene.fan_power
+      metadata: {}
+  mode: single
+  icon: mdi:ceiling-fan
+ola_charger_turn_off:
+  alias: Ola Charger turn off
+  sequence:
+  - variables:
+      initial_energy: '{{ initial_energy | float }}'
+      current_energy: '{{ current_energy | float }}'
+      battery_percent: '{{ battery_percent | float }}'
+      energy_threshold: '{{ (80 - battery_percent) * 0.0396 * 1.06 }}'
+  - condition: template
+    value_template: '{{ current_energy is defined and battery_percent is defined }}'
+  - variables:
+      energy_consumption: '{{ current_energy - initial_energy }}'
+  - condition: template
+    value_template: '{{ energy_consumption >= energy_threshold }}'
+  - service: switch.turn_off
+    entity_id: switch.ola_charger_switch
+  mode: restart
+  icon: mdi:moped-electric

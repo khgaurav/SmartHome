@@ -1,0 +1,150 @@
+name: media-stack
+services:
+  vpn:
+    image: qmcgaw/gluetun:latest
+    container_name: vpn
+    hostname: vpn
+    restart: unless-stopped
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    environment:
+      - VPN_SERVICE_PROVIDER=protonvpn
+      - VPN_TYPE=wireguard
+      - WIREGUARD_PRIVATE_KEY=<wireguard_private_key>
+      - OPENVPN_USER=${VPNUSER}
+      - OPENVPN_PASSWORD=${VPNPASS}
+      - SERVER_COUNTRIES=Japan
+      - FREE_ONLY=on
+        # networks:
+      # - vpn
+    ports:
+      # prowlarr ports
+      - 9696:9696
+    networks:
+      vpn_network:
+  radarr:
+    image: linuxserver/radarr:latest
+    ports:
+      - 7878:7878
+    environment:
+      - PUID=${DPUID}
+      - PGID=${DPGID}
+      - TZ=${CURRENTTZ}
+    volumes:
+      - ${DHOME}/radarr:/config
+      - ${DMEDIA}:/data
+    networks:
+      vpn_network:
+        ipv4_address: 172.19.0.20
+    restart: unless-stopped
+
+  sonarr:
+    image: linuxserver/sonarr:latest
+    ports:
+      - 8989:8989
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=${CURRENTTZ}
+    volumes:
+      - ${DHOME}/sonarr:/config
+      - ${DMEDIA}:/data
+    networks:
+      vpn_network:
+        ipv4_address: 172.19.0.21
+    restart: unless-stopped
+
+  lidarr:
+    image: linuxserver/lidarr:latest
+    ports:
+      - 8686:8686
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=${CURRENTTZ}
+    volumes:
+      - ${DHOME}/lidarr:/config
+      - ${DMEDIA}:/data
+    networks:
+      vpn_network:
+        ipv4_address: 172.19.0.22
+    restart: unless-stopped
+
+  prowlarr:
+    image: linuxserver/prowlarr:latest
+    network_mode: container:vpn
+      #networks:
+      # - mynetwork
+      #ports:
+      #- 9696:9696
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=${CURRENTTZ}
+    volumes:
+      -  ${DHOME}/prowlarr:/config
+    depends_on:
+      - vpn
+    restart: unless-stopped
+
+  bazarr:
+    image: linuxserver/bazarr:latest
+    ports:
+      - 6767:6767
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=${CURRENTTZ}
+    volumes:
+      -  ${DHOME}/bazarr:/config
+      -  ${DMEDIA}:/data
+    networks:
+      vpn_network:
+        ipv4_address: 172.19.0.23
+    restart: unless-stopped
+
+  jellyfin:
+    image: jellyfin/jellyfin:latest
+    ports:
+      - 8096:8096
+      - 7359:7359/udp
+      - 8920:8920
+    environment:
+      - PUID=1000
+      - PGID=1000
+    volumes:
+      - ${DHOME}/jellyfin:/config
+      - ${DMEDIA}/Movies:/data/movies
+      - ${DMEDIA}/TV:/data/tvshows
+      - ${DMEDIA}/Music:/data/music
+    devices:
+      - /dev/dri:/dev/dri
+    networks:
+      vpn_network:
+        ipv4_address: 172.19.0.24
+    restart: unless-stopped
+
+  qbittorrent:
+    image: linuxserver/qbittorrent:latest
+    ports:
+      - 5080:5080
+      - 6881:6881
+      - 6881:6881/udp
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=${CURRENTTZ}
+      - WEBUI_PORT=5080
+    volumes:
+      - ${DHOME}/qbittorrent:/config
+      - ${DMEDIA}:/data
+    networks:
+      vpn_network:
+        ipv4_address: 172.19.0.25
+    restart: unless-stopped
+
+networks:
+  vpn_network:
+    external: true

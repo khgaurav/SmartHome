@@ -1,0 +1,94 @@
+- id: '1644686013375'
+  name: All devices off
+  entities:
+    light.bathroom_on_off:
+      supported_color_modes:
+      - onoff
+      off_with_transition: false
+      off_brightness:
+      icon: mdi:bathtub-outline
+      friendly_name: Bathroom
+      supported_features: 8
+      state: 'off'
+    light.tubelight_on_off:
+      supported_color_modes:
+      - onoff
+      off_with_transition: false
+      off_brightness:
+      icon: mdi:bed
+      friendly_name: Tubelight
+      supported_features: 8
+      state: 'off'
+    light.night_on_off:
+      supported_color_modes:
+      - onoff
+      off_with_transition: false
+      off_brightness:
+      icon: mdi:weather-night
+      friendly_name: Night
+      supported_features: 8
+      state: 'off'
+    switch.workstation_on_off:
+      icon: mdi:desktop-tower-monitor
+      friendly_name: Workstation
+      state: 'off'
+    switch.gaurav_laptop:
+      assumed_state: true
+      icon: mdi:laptop
+      friendly_name: Gaurav's Laptop
+      state: 'off'
+    media_player.nesthubc9fc:
+      friendly_name: Gaurav's Bedroom display
+      supported_features: 152461
+      state: 'off'
+    fan.gaurav_fan:
+      preset_modes:
+      percentage: 0
+      percentage_step: 16.666666666666668
+      preset_mode:
+      icon: mdi:ceiling-fan
+      friendly_name: Fan
+      supported_features: 1
+      state: 'off'
+  icon: mdi:lightbulb-off
+  metadata:
+    fan.gaurav_fan:
+      entity_only: true
+- id: '1646551898375'
+  name: Gaurav Bedroom off
+  entities:
+    light.night_on_off:
+      supported_color_modes:
+      - onoff
+      off_with_transition: false
+      off_brightness:
+      icon: mdi:weather-night
+      friendly_name: Night
+      supported_features: 8
+      state: 'off'
+    light.tubelight_on_off:
+      supported_color_modes:
+      - onoff
+      off_with_transition: false
+      off_brightness:
+      icon: mdi:bed
+      friendly_name: Tubelight
+      supported_features: 8
+      state: 'off'
+    fan.gaurav_fan:
+      preset_modes:
+      percentage: 0
+      percentage_step: 16.666666666666668
+      preset_mode:
+      icon: mdi:ceiling-fan
+      friendly_name: Fan
+      supported_features: 1
+      state: 'off'
+    switch.workstation_on_off:
+      icon: mdi:desktop-tower-monitor
+      friendly_name: Workstation
+      state: 'off'
+  icon: mdi:bed
+  metadata:
+    fan.gaurav_fan:
+      entity_only: true

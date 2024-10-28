@@ -1,0 +1,124 @@
+services:
+  home-assistant:
+    container_name: homeassistant
+    privileged: true
+    restart: unless-stopped
+    environment:
+      - TZ=${CURRENTTZ}
+    volumes:
+      - '${DHOME}/HA/config:/config'
+      - '/run/dbus:/run/dbus:ro'
+    network_mode: host
+    image: 'ghcr.io/home-assistant/home-assistant:stable'
+
+  cloudflared:
+    image: cloudflare/cloudflared
+    container_name: cloudflared
+    restart: unless-stopped
+    network_mode: host
+    command: tunnel --no-autoupdate run --token <your_token>
+  mosquitto:
+    image: eclipse-mosquitto
+    container_name: mosquitto
+    restart: unless-stopped
+    volumes:
+      - ${DHOME}/mosquitto:/mosquitto
+    ports:
+      - 1883:1883
+      - 9001:9001
+      #  network_mode: "host"
+
+  portainer:
+    container_name: portainer
+    image: portainer/portainer-ce
+    restart: always
+    ports:
+      - "9000:9000/tcp"
+    environment:
+      - TZ=${CURRENTTZ}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ${DHOME}/portainer:/data
+  
+  frigate:
+    container_name: frigate
+    privileged: true # this may not be necessary for all setups
+    restart: unless-stopped
+    image: ghcr.io/blakeblackshear/frigate:stable
+    shm_size: "100mb" # update for your cameras based on calculation above
+    devices:
+      - /dev/bus/usb:/dev/bus/usb # passes the USB Coral, needs to be modified for other versions
+      # - /dev/apex_0:/dev/apex_0 # passes a PCIe Coral, follow driver instructions here https://coral.ai/docs/m2/get-started/#2a-on-linux
+      - /dev/dri/renderD128 # for intel hwaccel, needs to be updated for your hardware
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ${DHOME}/frigate/config:/config
+      - ${DRECORD}:/media/frigate
+      - type: tmpfs # Optional: 1GB of memory, reduces SSD/SD Card wear
+        target: /tmp/cache
+        tmpfs:
+          size: 1000000000
+    ports:
+      - "5000:5000"
+      - "1935:1935" # RTMP feeds
+      - "8554:8554"
+    environment:
+      FRIGATE_RTSP_PASSWORD: "password"
+    network_mode: bridge
+
+  duplicati:
+    image: lscr.io/linuxserver/duplicati:latest
+    container_name: duplicati
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=${CURRENTTZ}
+      - CLI_ARGS= #optional
+    volumes:
+      - ${DHOME}/duplicati/config:/config
+      - ${DHOME}:/source
+    ports:
+      - 8200:8200
+    restart: unless-stopped
+
+  airconnect:
+    image: 1activegeek/airconnect:latest
+    container_name: airconnect
+    network_mode: host
+    restart: unless-stopped
+      #  pihole:
+      #    container_name: pihole
+      #    image: pihole/pihole:latest
+      #    ports:
+      #      - "53:53/tcp"
+      #      - "53:53/udp"
+      #      - "8000:80/tcp"
+      #    environment:
+      #      - TZ=${CURRENTTZ} #this is the time zone
+      #    volumes:
+      #       - './etc-pihole/:/etc/pihole/'
+      #       - './etc-dnsmasq.d/:/etc/dnsmasq.d/'
+      #    dns:
+      #      - 127.0.0.1
+      #      - 1.1.1.1
+      #    cap_add:
+      #      - NET_ADMIN
+      #    restart: unless-stopped
+      
+  tailscale:
+    image: tailscale/tailscale:latest
+    hostname: tailscale-server
+    environment:
+      - TS_AUTHKEY=<tailscale_auth_key>
+      - TS_EXTRA_ARGS=--advertise-tags=tag:container --advertise-exit-node 
+      - TS_STATE_DIR=/var/lib/tailscale
+      - TS_USERSPACE=false
+      - TS_DEBUG_FIREWALL_MODE=nftables
+    volumes:
+      - ${DHOME}/tailscale/state:/var/lib/tailscale
+      - /dev/net/tun:/dev/net/tun
+    cap_add:
+      - net_admin
+      - sys_module
+    network_mode: host
+    restart: unless-stopped

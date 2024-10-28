@@ -1,0 +1,102 @@
+# Configure a default setup of Home Assistant (frontend, api, etc)
+default_config:
+
+http:
+ use_x_forwarded_for: true
+ trusted_proxies:
+  - ::1
+
+zha:
+  device_config:
+    80:4b:50:ff:fe:a7:fd:a1-1:
+      type: "fan"
+    80:4b:50:ff:fe:a7:fb:56-1:
+      type: "switch"
+
+google_assistant:
+  project_id: sahanasri-home-assistant
+  service_account: !include SERVICE_ACCOUNT.json
+  report_state: true
+  exposed_domains:
+    - switch
+    - light
+    - camera
+    - group
+    - scene
+    - script
+    - fan
+  entity_config:
+    media_player.fire_tv_stick:
+      name: Master Bedroom Fire TV
+      room: Master Bedroom
+
+fan:
+  - platform: template
+    fans:
+      gaurav_fan:
+        friendly_name: "Fan"
+        unique_id: atombergfangaurav
+        value_template: "{{ states('input_boolean.gaurav_fan_state') }}" 
+        percentage_template: "{{ states('input_number.gaurav_fan_percentage') if is_state('input_boolean.gaurav_fan_state', 'on') else 0 }}"
+        turn_on:
+          - service: input_boolean.turn_on
+            target:
+              entity_id: input_boolean.gaurav_fan_state
+          - service: script.turn_on
+            target:
+              entity_id: script.control_fan
+        turn_off:
+          - service: input_boolean.turn_off
+            target:
+              entity_id: input_boolean.gaurav_fan_state
+          - service: script.turn_on
+            target:
+              entity_id: script.control_fan
+        set_percentage:
+          - service: input_boolean.turn_{{ 'on' if percentage > 0 else 'off' }}
+            target:
+              entity_id: input_boolean.gaurav_fan_state
+          - service: input_number.set_value
+            target:
+              entity_id: input_number.gaurav_fan_percentage
+            data:
+              value: "{{ percentage }}"
+          - service: script.turn_on
+            target:
+              entity_id: script.control_fan
+        speed_count: 6
+
+wake_on_lan:
+
+switch:
+  - platform: wake_on_lan
+    mac: XX:30:B9:AE:EC:67
+    name: "Gaurav's Laptop"
+
+template:
+  - sensor:
+    - name: Ola Charging cost
+      unit_of_measurement: '₹'
+      state: >
+        {{ states('sensor.ola_charger_summation_delivered') | float(default=0.0) | multiply(7) | round(1) }}
+      icon: mdi:currency-rupee
+  - sensor:
+    - name: Sahanasri Temperature
+      unit_of_measurement: "°C"
+      device_class: temperature
+      state: "{{ state_attr('weather.sahanasri', 'temperature')  }}"
+
+#homeassistant:
+#  media_dirs:
+#    movies: /data/data/com.termux/files/home/storage/movies
+
+# Text to speech
+tts:
+ - platform: google_translate
+
+frontend:
+  themes: !include_dir_merge_named themes
+group: !include groups.yaml
+automation: !include automations.yaml
+script: !include scripts.yaml
+scene: !include scenes.yaml
