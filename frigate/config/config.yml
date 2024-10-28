@@ -1,0 +1,173 @@
+mqtt:
+  host: localhost
+  user: <mosquitto username>
+  password: <musquitto password>
+  stats_interval: 300
+  topic_prefix: frigate
+  client_id: frigate
+
+ffmpeg:
+  hwaccel_args:
+    - -hwaccel
+    - vaapi
+    - -hwaccel_device
+    - /dev/dri/renderD128
+
+detectors:
+  ov:
+    type: openvino
+    device: GPU
+
+model:
+  width: 300
+  height: 300
+  input_tensor: nhwc
+  input_pixel_format: bgr
+  path: /openvino-model/ssdlite_mobilenet_v2.xml
+  labelmap_path: /openvino-model/coco_91cl_bkgr.txt
+
+objects:
+  track:
+    - person
+    - bus
+    - car
+    - bicycle
+    - motorcycle
+
+snapshots:
+  enabled: true
+  clean_copy: false
+  timestamp: true
+  retain:
+    default: 60
+
+record:
+  enabled: true
+  retain:
+    days: 7
+    mode: all
+  events:
+    retain:
+      default: 30
+      mode: active_objects
+
+go2rtc:
+  streams:
+    main_road:
+      - rtsp://username:password@192.168.0.150:554/Streaming/Channels/101
+    main_road_sub:
+      - rtsp://username:password@192.168.0.150:554/Streaming/Channels/102
+    front_door:
+      - rtsp://username:password@192.168.0.151/cam/realmonitor?channel=1&subtype=0
+    front_door_sub:
+      - rtsp://username:password@192.168.0.151/cam/realmonitor?channel=1&subtype=1
+    office_entrance:
+      - rtsp://username:password@192.168.0.152/cam/realmonitor?channel=1&subtype=0
+    office_entrance_sub:
+      - rtsp://username:password@192.168.0.152/cam/realmonitor?channel=1&subtype=1
+    terrace:
+      - rtsp://username:password@192.168.0.153:554/Streaming/Channels/101
+    terrace_sub:
+      - rtsp://username:password@192.168.0.153:554/Streaming/Channels/102
+
+cameras:
+  Main_Road:
+    ffmpeg:
+      inputs:
+        - path: rtsp://127.0.0.1:8554/main_road
+          input_args: preset-rtsp-restream
+          roles:
+            - record
+        - path: rtsp://127.0.0.1:8554/main_road_sub
+          roles:
+            - detect
+    detect:
+      width: 640 # <---- update for your camera's resolution
+      height: 360 # <---- update for your camera's resolution
+      fps: 6
+      enabled: true
+    zones:
+      Near_Car:
+        coordinates: 0.601,0.026,0.392,0.126,0.011,0.752,0,1,0.813,0.992,0.909,0.191
+        loitering_time: 2
+    objects:
+      mask: 0,0,0,0.602,0.275,0.299,0.23,0
+  Front_Door:
+    ffmpeg:
+      inputs:
+        - path: rtsp://127.0.0.1:8554/front_door
+          roles:
+            - record
+        - path: rtsp://127.0.0.1:8554/front_door_sub
+          roles:
+            - detect
+    detect:
+      width: 480 # <---- update for your camera's resolution
+      height: 704 # <---- update for your camera's resolution
+      fps: 5
+      enabled: true
+    objects:
+      filters:
+        person:
+          mask: 0,0,0,0.206,1,0.144,1,0,0.369,0
+    zones:
+      Outside_Door:
+        coordinates: 0.305,0.287,0.704,0.29,0.866,0.967,0.209,0.945
+        loitering_time: 5
+    review:
+      alerts:
+        required_zones: Outside_Door
+  Office_Entrance:
+    ffmpeg:
+      inputs:
+        - path: rtsp://127.0.0.1:8554/office_entrance
+          roles:
+            - record
+        - path: rtsp://127.0.0.1:8554/office_entrance_sub
+          roles:
+            - detect
+    detect:
+      width: 480 # <---- update for your camera's resolution
+      height: 704 # <---- update for your camera's resolution
+      fps: 5
+      enabled: true
+  Terrace:
+    ffmpeg:
+      inputs:
+        - path: rtsp://127.0.0.1:8554/terrace
+          roles:
+            - record
+        - path: rtsp://127.0.0.1:8554/terrace_sub
+          roles:
+            - detect
+    detect:
+      width: 640 # <---- update for your camera's resolution
+      height: 360 # <---- update for your camera's resolution
+      fps: 6
+      enabled: true
+    objects:
+      mask: 0.496,0,0.949,0.457,0.744,1,1,1,1,0
+birdseye:
+  enabled: true
+  width: 1280
+  height: 720
+  # Optional: Encoding quality of the mpeg1 feed (default: shown below)
+  # 1 is the highest quality, and 31 is the lowest. Lower quality feeds utilize less CPU resources.
+  quality: 20
+  # Optional: Mode of the view. Available options are: objects, motion, and continuous
+  #   objects - cameras are included if they have had a tracked object within the last 30 seconds
+  #   motion - cameras are included if motion was detected in the last 30 seconds
+  #   continuous - all cameras are included always
+  mode: continuous
+  restream: false
+live:
+  height: 640
+  quality: 1
+version: 0.14
+camera_groups:
+  Entrance:
+    order: 1
+    icon: LuDoorClosed
+    cameras:
+      - Front_Door
+      - Main_Road

@@ -11,3 +11,17 @@ This project is a smart home system that contains multiple containers that are r
 - **Cloudflared**: Creates a cloudflare tunnel to access all the above services through my personal domain
 - **Jellyfin**: This container is responsible for storing photos and media and serving them to the network
 - **Bazarr**: This container is responsible for downloading subtitles for the media in Jellyfin
+
+# Setup Instructions
+## Prerequisites
+- Docker
+- Docker Compose
+- A domain name
+
+## Steps
+1. Clone the repository
+2. Replace all the placeholders in config files with your own values
+3. Run the following command to start the containers
+```bash
+docker compose -f docker-compose.yaml -f media.yaml up -d
+```
