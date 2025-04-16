@@ -2,7 +2,7 @@
 .cloudflared/*
 !.cloudflared/config.yaml
 #Ignore frigate backups
-frigate/*
+frigate/config/*
 !frigate/config/config.yml
 # Ignore Home assistant secrets and component files
 HA/config/*

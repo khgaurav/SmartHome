@@ -25,6 +25,7 @@ services:
     networks:
       vpn_network:
   radarr:
+    container_name: radarr
     image: linuxserver/radarr:latest
     ports:
       - 7878:7878
@@ -41,6 +42,7 @@ services:
     restart: unless-stopped
 
   sonarr:
+    container_name: sonarr
     image: linuxserver/sonarr:latest
     ports:
       - 8989:8989
@@ -57,6 +59,7 @@ services:
     restart: unless-stopped
 
   lidarr:
+    container_name: lidarr
     image: linuxserver/lidarr:latest
     ports:
       - 8686:8686
@@ -73,6 +76,7 @@ services:
     restart: unless-stopped
 
   prowlarr:
+    container_name: prowlarr
     image: linuxserver/prowlarr:latest
     network_mode: container:vpn
       #networks:
@@ -88,8 +92,23 @@ services:
     depends_on:
       - vpn
     restart: unless-stopped
+  flaresolverr:
+    container_name: flaresolverr
+    image: ghcr.io/flaresolverr/flaresolverr:latest
+    network_mode: container:vpn
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=${CURRENTTZ}
+      - LOG_LEVEL=info
+    volumes:
+      - ${DHOME}/flaresolverr:/config
+    depends_on:
+      - vpn
+    restart: unless-stopped
 
   bazarr:
+    container_name: bazarr
     image: linuxserver/bazarr:latest
     ports:
       - 6767:6767
@@ -106,6 +125,7 @@ services:
     restart: unless-stopped
 
   jellyfin:
+    container_name: jellyfin
     image: jellyfin/jellyfin:latest
     ports:
       - 8096:8096
@@ -127,6 +147,7 @@ services:
     restart: unless-stopped
 
   qbittorrent:
+    container_name: qbittorrent
     image: linuxserver/qbittorrent:latest
     ports:
       - 5080:5080

@@ -106,6 +106,7 @@ services:
       #    restart: unless-stopped
       
   tailscale:
+    container_name: tailscale
     image: tailscale/tailscale:latest
     hostname: tailscale-server
     environment:
@@ -121,4 +122,10 @@ services:
       - net_admin
       - sys_module
     network_mode: host
+    restart: unless-stopped
+  portfolio:
+    container_name: portfolio
+    build: ${DHOME}/portfolio
+    ports: 
+      - "5699:80"
     restart: unless-stopped

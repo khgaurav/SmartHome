@@ -46,11 +46,12 @@ record:
   retain:
     days: 7
     mode: all
-  events:
+  alerts:
     retain:
-      default: 30
-      mode: active_objects
-
+      days: 60
+  detections:
+    retain:
+      days: 30
 go2rtc:
   streams:
     main_road:
@@ -163,7 +164,7 @@ birdseye:
 live:
   height: 640
   quality: 1
-version: 0.14
+version: 0.15-1
 camera_groups:
   Entrance:
     order: 1
