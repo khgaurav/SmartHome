@@ -11,17 +11,16 @@ services:
       - /dev/net/tun:/dev/net/tun
     environment:
       - VPN_SERVICE_PROVIDER=protonvpn
-      - VPN_TYPE=wireguard
-      - WIREGUARD_PRIVATE_KEY=<wireguard_private_key>
       - OPENVPN_USER=${VPNUSER}
       - OPENVPN_PASSWORD=${VPNPASS}
-      - SERVER_COUNTRIES=Japan
+      - SERVER_COUNTRIES=Japan,Netherlands,United States
       - FREE_ONLY=on
-        # networks:
-      # - vpn
+
     ports:
       # prowlarr ports
       - 9696:9696
+      # Flaresolverr ports
+      - 8191:8191
     networks:
       vpn_network:
   radarr:

@@ -2,22 +2,22 @@
   alias: Gaurav Bedroom devices motion
   description: 'Turn on bedroom light when motion detected near stairs and sun is
     set and turn off bathroom '
-  trigger:
+  triggers:
   - type: motion
-    platform: device
     device_id: 5495ae59400c4fe7c65b446228b5fe27
     entity_id: binary_sensor.motion_sensor
     domain: binary_sensor
-  condition:
+    trigger: device
+  conditions:
   - condition: state
     entity_id: person.gaurav_k_h
     state: home
-  action:
+  actions:
   - type: turn_off
     device_id: 683165b3b1105d04abb62e5246231b4d
     entity_id: light.bathroom_on_off
     domain: light
-    enabled: false
+    enabled: true
   - condition: device
     type: is_off
     device_id: 96605113eee425a9dff222a12c62d582
@@ -383,24 +383,38 @@
   - scene: scene.gqurav_bedroom_off
   mode: single
 - id: '1664113530133'
-  alias: 'Night lights Ground floor '
+  alias: Night lights Ground floor
   description: ''
-  trigger:
-  - platform: time
-    at: '21:45:00'
+  triggers:
+  - at: '21:45:00'
     id: off_door_light
-  - platform: time
-    at: '21:45:00'
+    trigger: time
+  - at: '21:45:00'
     id: on_living_light
-  - platform: time
-    at: 06:30:00
+    trigger: time
+  - at: 06:30:00
     id: off_living_light
-  - platform: sun
-    event: sunset
-    offset: -00:10:00
+    trigger: time
+  - event: sunset
+    offset: -00:30:00
     id: on_door_light
-  condition: []
-  action:
+    trigger: sun
+  - entity_id:
+    - binary_sensor.front_door_person_occupancy
+    to: 'on'
+    id: person_detected_front_door
+    trigger: state
+    enabled: false
+  - entity_id:
+    - binary_sensor.front_door_person_occupancy
+    to: 'off'
+    for:
+      minutes: 5
+    id: person_not_detected_front_door
+    trigger: state
+    enabled: false
+  conditions: []
+  actions:
   - if:
     - condition: trigger
       id: on_door_light
@@ -409,28 +423,28 @@
       device_id: 2846164d0aa5ce931f638ac964446998
       entity_id: 50d8650c011665c27b105ac5ef0f5080
       domain: light
-    - service: light.turn_on
-      data: {}
+    - data: {}
       target:
         area_id: entrance
+      action: light.turn_on
     else:
     - if:
       - condition: trigger
         id: off_door_light
       then:
-      - service: light.turn_off
-        data: {}
+      - data: {}
         target:
           area_id: entrance
+        action: light.turn_off
       else:
       - if:
         - condition: trigger
           id: on_living_light
         then:
-        - service: light.turn_on
-          data: {}
+        - data: {}
           target:
             device_id: e363e4f728c874a2b823da292a5e3369
+          action: light.turn_on
         else:
         - if:
           - condition: or
@@ -438,11 +452,47 @@
             - condition: trigger
               id: off_living_light
           then:
-          - service: light.turn_off
-            data: {}
+          - data: {}
             target:
               device_id: e363e4f728c874a2b823da292a5e3369
-          else: []
+            action: light.turn_off
+          else:
+          - if:
+            - condition: trigger
+              id: person_detected_front_door
+            - condition: or
+              conditions:
+              - condition: time
+                after: '21:45:00'
+              - condition: time
+                before: 06:30:00
+            - condition: state
+              entity_id: light.front_door_light
+              state: 'off'
+            then:
+            - target:
+                entity_id: light.front_door_light
+              data: {}
+              action: light.turn_on
+            else:
+            - if:
+              - condition: trigger
+                id: person_not_detected_front_door
+              - condition: or
+                conditions:
+                - condition: time
+                  after: '21:45:00'
+                - condition: time
+                  before: 06:30:00
+              - condition: state
+                entity_id: light.front_door_light
+                state: 'on'
+              then:
+              - target:
+                  entity_id: light.front_door_light
+                data: {}
+                action: light.turn_off
+              else: []
   mode: parallel
   max: 10
 - id: '1664949035598'
@@ -588,3 +638,85 @@
       message: Please disconnect ola charger
       title: Charging completed
   mode: restart
+- id: '1750230101122'
+  alias: Ground Floor Button
+  description: ''
+  triggers:
+  - device_id: 0ec4108684bc4c24e9bbf88ce4576b72
+    domain: zha
+    type: remote_button_short_press
+    subtype: button
+    id: button_single
+    trigger: device
+  - device_id: 0ec4108684bc4c24e9bbf88ce4576b72
+    domain: zha
+    type: remote_button_double_press
+    subtype: button
+    id: button_double
+    trigger: device
+  - device_id: 0ec4108684bc4c24e9bbf88ce4576b72
+    domain: zha
+    type: remote_button_long_press
+    subtype: button
+    trigger: device
+    id: butron_hold
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: button_single
+      sequence:
+      - action: scene.turn_on
+        metadata: {}
+        data: {}
+        target:
+          entity_id: scene.turn_on_tv_hdmi_2
+        enabled: false
+      - delay:
+          hours: 0
+          minutes: 0
+          seconds: 30
+          milliseconds: 0
+        enabled: false
+      - action: scene.turn_on
+        metadata: {}
+        data: {}
+        target:
+          entity_id: scene.colors_kannada
+    - conditions:
+      - condition: trigger
+        id:
+        - butron_hold
+        - button_double
+      sequence:
+      - action: scene.turn_on
+        metadata: {}
+        data: {}
+        target:
+          entity_id: scene.turn_on_tv_hdmi_2
+        enabled: false
+      - delay:
+          hours: 0
+          minutes: 0
+          seconds: 30
+          milliseconds: 0
+        enabled: false
+      - action: scene.turn_on
+        metadata: {}
+        data: {}
+        target:
+          entity_id: scene.public_tv
+    default:
+    - action: scene.turn_on
+      metadata: {}
+      data: {}
+      target:
+        entity_id: scene.turn_on_tv_hdmi_2
+      enabled: false
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 10
+      milliseconds: 0
+  mode: single

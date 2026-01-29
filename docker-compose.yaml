@@ -22,7 +22,9 @@ services:
     container_name: mosquitto
     restart: unless-stopped
     volumes:
-      - ${DHOME}/mosquitto:/mosquitto
+      - ${DHOME}/mosquitto/config:/mosquitto/config
+      - ${DHOME}/mosquitto/data:/mosquitto/data
+      - ${DHOME}/mosquitto/log:/mosquitto/log
     ports:
       - 1883:1883
       - 9001:9001
@@ -45,7 +47,7 @@ services:
     privileged: true # this may not be necessary for all setups
     restart: unless-stopped
     image: ghcr.io/blakeblackshear/frigate:stable
-    shm_size: "100mb" # update for your cameras based on calculation above
+    shm_size: "120mb" # update for your cameras based on calculation above
     devices:
       - /dev/bus/usb:/dev/bus/usb # passes the USB Coral, needs to be modified for other versions
       # - /dev/apex_0:/dev/apex_0 # passes a PCIe Coral, follow driver instructions here https://coral.ai/docs/m2/get-started/#2a-on-linux
@@ -64,7 +66,6 @@ services:
       - "8554:8554"
     environment:
       FRIGATE_RTSP_PASSWORD: "password"
-    network_mode: bridge
 
   duplicati:
     image: lscr.io/linuxserver/duplicati:latest
@@ -128,4 +129,16 @@ services:
     build: ${DHOME}/portfolio
     ports: 
       - "5699:80"
+    restart: unless-stopped
+  vscode-server:
+    image: ahmadnassri/vscode-server:latest
+    container_name: vscode-server
+    ports:
+      - "9123:8000"
+    volumes:
+      - ${DHOME}/vscode/server-data:/root/.vscode/server-data
+      - ${DHOME}/vscode/user-data:/root/.vscode/user-data
+      - ${DHOME}/vscode/cli-data:/root/.vscode/cli-data
+      - ${DHOME}/vscode/extensions:/root/.vscode/extensions
+      - /home/gauravkh:/home/ubuntu
     restart: unless-stopped

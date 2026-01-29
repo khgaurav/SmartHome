@@ -3,8 +3,6 @@ mqtt:
   user: <mosquitto username>
   password: <musquitto password>
   stats_interval: 300
-  topic_prefix: frigate
-  client_id: frigate
 
 ffmpeg:
   hwaccel_args:
@@ -89,10 +87,14 @@ cameras:
       enabled: true
     zones:
       Near_Car:
-        coordinates: 0.601,0.026,0.392,0.126,0.011,0.752,0,1,0.813,0.992,0.909,0.191
+        coordinates: 
+          0.601,0.026,0.392,0.126,0.011,0.752,0,1,0.813,0.992,0.909,0.191
         loitering_time: 2
     objects:
       mask: 0,0,0,0.602,0.275,0.299,0.23,0
+    review:
+      alerts:
+        required_zones: Near_Car
   Front_Door:
     ffmpeg:
       inputs:
@@ -113,10 +115,14 @@ cameras:
           mask: 0,0,0,0.206,1,0.144,1,0,0.369,0
     zones:
       Outside_Door:
-        coordinates: 0.305,0.287,0.704,0.29,0.866,0.967,0.209,0.945
+        coordinates: 0.226,0.298,0.314,0.197,1,0.181,1,0.973,0.209,0.989
         loitering_time: 5
+        inertia: 3
+        objects: person
     review:
       alerts:
+        required_zones: Outside_Door
+      detections:
         required_zones: Outside_Door
   Office_Entrance:
     ffmpeg:
@@ -164,7 +170,7 @@ birdseye:
 live:
   height: 640
   quality: 1
-version: 0.15-1
+version: 0.16-0
 camera_groups:
   Entrance:
     order: 1
@@ -172,3 +178,9 @@ camera_groups:
     cameras:
       - Front_Door
       - Main_Road
+semantic_search:
+  enabled: false
+  reindex: false
+  model_size: large
+detect:
+  enabled: true
